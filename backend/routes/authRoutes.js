@@ -2,7 +2,7 @@ import express from "express"
 import passport from "passport"
 import twilio from 'twilio'
 import dotenv from 'dotenv'
-import {Login, Register} from "../controllers/authControl.js"
+import {Login, Register, getUserData} from "../controllers/authControl.js"
 
 const router = express.Router()
 dotenv.config()
@@ -17,6 +17,8 @@ router.post('/login', Login)
 
 router.put('/register/:userId', Register)
 
+router.get('/user/:userId', getUserData);
+
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback',
@@ -24,11 +26,11 @@ router.get('/google/callback',
     (req, res) => {
         const isNew = req.user.isNew;
         const userId = req.user.user._id;
+        // console.log(req.user.user);
         if (isNew) {
-            
-            res.redirect(`http://localhost:8003/api/auth/register/${userId}`);
+            res.redirect(`http://localhost:5173/register/${userId}`);
         } else {
-            res.redirect('http://localhost:8003/api/user/profile');
+            res.redirect('http://localhost:5173/home');
         }
     }
 );
@@ -43,19 +45,19 @@ router.post('/send-otp',async(req,res)=>{
             to:phoneNumber
         })
         otps[phoneNumber] = otp;
-        res.status(200).send(`OTP sent to ${phoneNumber}`);
+        res.status(200).json({message:'OTP send successfully'});
     } catch (error) {
-        res.status(500).send('Failed to send OTP');
+        res.status(500).json({ error: 'Failed to send verification' });
     }
 })
 
 router.post('/verify-otp', (req, res) => {
     const { phoneNumber, otp } = req.body;
-    if (otps[phoneNumber] === otp) {
+    if (otps[phoneNumber] && otps[phoneNumber] === otp) {
         delete otps[phoneNumber];
-        res.status(200).send('OTP verified successfully');
+        res.status(200).json({ message: 'Verification successful' });
     } else {
-        res.status(400).send('Invalid OTP or OTP expired');
+        res.status(400).json({ error: 'Invalid code' });
     }
 });
 

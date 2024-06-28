@@ -47,7 +47,10 @@ const userSchema = mongoose.Schema({
     qualification: {
         type: String,
     },
-    professional: {
+    username:{
+        type:String
+    },
+    profession: {
         type: String,
     },
     password: {
@@ -55,6 +58,9 @@ const userSchema = mongoose.Schema({
     },
     confirmPassword: {
         type: String
+    },
+    phno:{
+        type: Number,
     },
     createdAt: {
         type: Date,

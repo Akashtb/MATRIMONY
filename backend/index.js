@@ -7,12 +7,19 @@ import passportSetup from './confige/passportjs.js'
 import session from 'express-session';
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-
+import cors from "cors"
 
 const app = express()
 app.use(bodyParser.json()); 
 dotenv.config()
 app.use(express.json())
+const corsOptions = {
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
  
 passportSetup(passport)
 app.use(
